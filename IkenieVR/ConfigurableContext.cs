@@ -9,7 +9,7 @@ using VRGIN.Core;
 using VRGIN.Helpers;
 using VRGIN.Visuals;
 
-namespace VRGIN.Template
+namespace IkenieVR
 {
     /// <summary>
     /// Context class that can be serialized as an XML. Normally, you would implement this yourself and simply override getters with sensible values.
@@ -25,6 +25,9 @@ namespace VRGIN.Template
             // We'll keep those always the same
             _Materials = new DefaultMaterialPalette();
             _Settings = VRSettings.Load<VRSettings>("VRSettings.xml");
+
+            _Materials.UnlitTransparent = new Material(UnityHelper.GetShader("UnlitColorCutout"));
+            _Materials.UnlitTransparentCombined = new Material(UnityHelper.GetShader("UnlitColorCutoutCombined"));
 
             // Set defaults
             ConfineMouse = true;

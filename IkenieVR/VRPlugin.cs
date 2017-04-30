@@ -8,8 +8,10 @@ using System.Text;
 using System.Xml.Serialization;
 using VRGIN.Core;
 using VRGIN.Helpers;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace VRGIN.Template
+namespace IkenieVR
 {
 
     /// <summary>
@@ -37,6 +39,37 @@ namespace VRGIN.Template
             }
         }
 
+        private class Interpreter : GameInterpreter
+        {
+            public override bool IsIgnoredCanvas(Canvas canvas)
+            {
+                return base.IsIgnoredCanvas(canvas);
+            }
+
+            protected override void OnStart()
+            {
+                base.OnStart();
+                VR.Camera.CopiedCamera += (s, e) =>
+                {
+                    var renderCameraUI = e.Camera.GetComponent("RenderCameraUI") as MonoBehaviour;
+                    if(renderCameraUI)
+                    {
+                        renderCameraUI.enabled = false;
+                        VRLog.Info("found RenderCameraUI {0}", e.Camera.name);
+                    }
+                    else
+                    {
+                        VRLog.Info("Not found RenderCameraUI {0}", e.Camera.name);
+                    }
+                };
+            }
+
+            public override bool IsIrrelevantCamera(Camera blueprint)
+            {
+                return blueprint.CompareTag("MainCamera");
+            }
+        }
+
         /// <summary>
         /// Determines when to boot the VR code. In most cases, it makes sense to do the check as described here.
         /// </summary>
@@ -50,7 +83,7 @@ namespace VRGIN.Template
                 // Boot VRManager!
                 // Note: Use your own implementation of GameInterpreter to gain access to a few useful operatoins
                 // (e.g. characters, camera judging, colliders, etc.)
-                VRManager.Create<GameInterpreter>(CreateContext("VRContext.xml"));
+                VRManager.Create<Interpreter>(CreateContext("VRContext.xml"));
                 VR.Manager.SetMode<GenericSeatedMode>();
             }
         }
@@ -67,7 +100,10 @@ namespace VRGIN.Template
                 {
                     try
                     {
-                        return serializer.Deserialize(file) as ConfigurableContext;
+                        var c = serializer.Deserialize(file) as ConfigurableContext;
+
+                        c.UILayerMask = LayerMask.GetMask("UI", "UI_back", "UI_front");
+                        return c;
                     }
                     catch (Exception e)
                     {
@@ -100,6 +136,6 @@ namespace VRGIN.Template
         public void OnLevelWasInitialized(int level) { }
         public void OnLevelWasLoaded(int level) { }
         public void OnUpdate() { }
-        #endregion
-    }
+            #endregion
+        }
 }

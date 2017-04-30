@@ -8,7 +8,7 @@ using VRGIN.Core;
 using VRGIN.Helpers;
 using VRGIN.Modes;
 
-namespace VRGIN.Template
+namespace IkenieVR
 {
     class GenericSeatedMode : SeatedMode
     {
@@ -33,5 +33,15 @@ namespace VRGIN.Template
         //{
         //    VR.Manager.SetMode<GenericStandingMode>();
         //}
+
+        protected override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            if (VR.Camera.Origin.position.y > 10)
+            {
+                VR.Camera.Origin.position += Vector3.down * 8 + Vector3.forward * 2;
+            }
+        }
     }
 }
